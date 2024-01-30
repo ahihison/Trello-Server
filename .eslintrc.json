@@ -1,0 +1,78 @@
+{
+  "plugins": ["@typescript-eslint"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended", // Use recommended settings
+    "plugin:@typescript-eslint/recommended-type-checked" // Use type-checking settings (requires TypeScript 4.1+)
+  ],
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module",
+    "requireConfigFile": false, // This is required when using `extends: ["plugin:@typescript-eslint/recommended"]
+    "allowImportExportEverywhere": true, // Required to use rules which require type information
+    "project": "./tsconfig.json" // Specify the path to your tsconfig.json file
+  },
+  "rules": {
+    "@typescript-eslint/no-var-requires": "off", // cho phép dùng require
+    "@typescript-eslint/no-unused-vars": "error", // không cho phép khai báo biến không sử dụng
+    "@typescript-eslint/no-explicit-any": "off", // cho phép khai báo kiểu any
+    "@typescript-eslint/array-type": "off", // chỉ cho phép khai báo kiểu const variable: string[] = ["a", "b"]
+    "@typescript-eslint/type-annotation-spacing": "error", // Kiểm tra khoảng trắng sau dấu hai chấm
+    "@typescript-eslint/naming-convention": [
+      "error",
+      {
+        "selector": "class",
+        "format": ["PascalCase"] // Yêu cầu tên class viết theo kiểu PascalCase vd: NameClass
+      }
+    ],
+    "@typescript-eslint/explicit-module-boundary-types": "error", // yêu cầu khai báo kiểu dữ liệu
+    "no-console": 1,
+    "keyword-spacing": 1,
+
+    "arrow-spacing": 1,
+    "one-variable-per-declaration": "off", // không cho khai báo kiểu var a = 1, b = 2;
+
+    // không cho phép function làm tham số,
+    // const functionName = "alert("Hello, world!");";
+    // const myFunction = new Function(functionName);
+    // myFunction();
+    "no-new-func": "error",
+    "require-await": "error",
+    "no-bitwise": "error", // không cho sử dụng các toán tử bitwise &, |, <<, >>
+    "no-cond-assign": ["error", "always"], // không cho gán giá trị trong câu điều kiện
+    "no-duplicate-case": "error", // không cho switch case trùng nhau
+    "no-redeclare": "error", // không đặt biến trùng tên
+    "no-empty": "error", // không trống code vd: demo() { <trống> }
+    "no-eval": "error", // không dùng eval
+    "return-await": "off", // cho phép return await
+    "no-extra-boolean-cast": "error", // không cho dùng !!
+    "no-var": "error", // không dùng var
+    "no-unused-expressions": "error", // không cho phép biểu thức tính toán được tạo ra nhưng không được sử dụng
+    "radix": "off", // yêu cầu sung tham số radix (cơ số) parseInt()
+    "default-case": "error", // yêu cầu switch case phải có default
+    "use-isnan": "error", // báo lỗi nếu dùng hàm isNaN không đúng cách, cách đúng: const value = "abc"; Number.isNaN(Number(value))
+    "no-void": "error", // kiểm tra void có được dùng đúng cách
+    "no-require-imports": "off", // cho phép dùng require và import
+    "no-else-return": "error",
+    "indent": ["error", 4],
+    "semi": ["error", "always"], // yêu cầu dấu chấm phẩy
+    "node/exports-style": ["off"], // Ví dụ quy tắc liên quan đến Node.js
+    "node/no-deprecated-api": "off", // Ví dụ quy tắc liên quan đến Node.js
+    // Quy tắc trailing-comma chuyển từ tslint
+    "comma-dangle": [
+      "error",
+      {
+        "arrays": "never",
+        "objects": "never",
+        "imports": "never",
+        "exports": "never",
+        "functions": "never"
+      }
+    ], // không cho phép dấu phẩy cuối
+    "object-curly-spacing": ["error", "always"], // cần dấu phẩy sau {}
+    "space-infix-ops": "error", // Kiểm tra khoảng trắng sau toán tử
+    "comma-spacing": "error", // Kiểm tra khoảng trắng sau dấu phẩy
+    "no-var-requires": "off", // off cho phép sử dụng require
+    "import/no-anonymous-default-export": "off" // cho phép dùng export default
+  }
+}
