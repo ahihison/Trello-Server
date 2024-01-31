@@ -1,5 +1,5 @@
 import express from 'express';
-import { mapOrder } from '../src/utils/sorts';
+import { mapOrder } from '@/utils/sorts';
 
 const app = express();
 
@@ -8,7 +8,7 @@ const port = 8017;
 
 app.get('/', (req, res) => {
    
-    // eslint-disable-next-line no-console
+    // eslint-disable-next-line no-console, @typescript-eslint/no-unsafe-call
     console.log(mapOrder(
         [ { id: 'id-1', name: 'One' },
             { id: 'id-2', name: 'Two' },
@@ -25,3 +25,4 @@ app.listen(port, hostname, () => {
     // eslint-disable-next-line no-console
     console.log(`Hello Trung Quan Dev, I am running at ${ hostname }:${ port }/`);
 });
+
