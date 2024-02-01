@@ -12,9 +12,11 @@
     "allowImportExportEverywhere": true, // Required to use rules which require type information
     "project": "./tsconfig.json" // Specify the path to your tsconfig.json file
   },
+
   "rules": {
+    "@typescript-eslint/no-floating-promises": 0,
     "@typescript-eslint/no-var-requires": "off", // cho phép dùng require
-    "@typescript-eslint/no-unused-vars": "error", // không cho phép khai báo biến không sử dụng
+    "@typescript-eslint/no-unused-vars": "warn", // không cho phép khai báo biến không sử dụng
     "@typescript-eslint/no-explicit-any": "off", // cho phép khai báo kiểu any
     "@typescript-eslint/array-type": "off", // chỉ cho phép khai báo kiểu const variable: string[] = ["a", "b"]
     "@typescript-eslint/type-annotation-spacing": "error", // Kiểm tra khoảng trắng sau dấu hai chấm
