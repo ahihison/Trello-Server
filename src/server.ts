@@ -1,18 +1,20 @@
+/* eslint-disable require-await */
 import express from 'express';
 import { mapOrder } from '../src/utils/sorts';
-import { CONNECT_DB, GET_DB, CLOSE_DB } from './config/mongodb';
+import { CONNECT_DB, CLOSE_DB } from './config/mongodb';
 import exitHook from 'async-exit-hook';
+import  'dotenv/config';
+
 const app = express();
 
 const hostname = 'localhost';
 const port = 8017;
+
 const START_SERVER = () => {
-   
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises, @typescript-eslint/require-await
     app.get('/', async (req, res)  => {
-        console.log(await GET_DB().listCollections().toArray());
-        //  @typescript-eslint/no-unsafe-call
-       
+
         console.log(mapOrder(
             [ { id: 'id-1', name: 'One' },
                 { id: 'id-2', name: 'Two' },
@@ -34,6 +36,7 @@ const START_SERVER = () => {
 
 (async () => {
     try {
+       
         await CONNECT_DB();
         console.log('Connected to MongoDB successfully!');
         START_SERVER();
