@@ -11,10 +11,10 @@ const hostname = 'localhost';
 const port = 8017;
 
 const START_SERVER = () => {
-    
+    //enable request body json
+    app.use(express.json());
     // eslint-disable-next-line @typescript-eslint/no-misused-promises, @typescript-eslint/require-await
     app.use('/v1', API_V1);
-
     app.listen(port, hostname, () => {
     // eslint-disable-next-line no-console
         console.log(`Hello Sown Dev, I am running at ${ hostname }:${ port }/`);
