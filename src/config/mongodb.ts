@@ -3,7 +3,7 @@ import { MongoClient, ServerApiVersion } from "mongodb";
 import { Db } from 'mongodb';
 import  'dotenv/config';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 
