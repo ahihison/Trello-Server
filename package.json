@@ -7,9 +7,9 @@
     "lint": "eslint src --ext js,ts --report-unused-disable-directives --max-warnings 0",
     "clean": "rm -rf build && mkdir build",
     "build-babel": "babel ./src -d ./build/src",
-    "build": "npm run clean && npm run build-babel npx tsc",
-    "production": "npm run build && node ./build/src/server.js",
-    "dev": "nodemon --exec ts-node ./src/server.ts "
+    "build": "npm run clean && tsc -p .",
+    "production": "npm run build && cross-env BUILD_MODE=production node ./build/src/server.js",
+    "dev": "cross-env BUILD_MODE=dev nodemon --exec ts-node ./src/server.ts "
   },
   "author": "Sowndev",
   "license": "MIT",
@@ -36,6 +36,7 @@
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "async-exit-hook": "^2.0.1",
+    "cross-env": "^7.0.3",
     "dotenv": "^16.4.1",
     "express": "^4.18.2",
     "http-status-codes": "^2.3.0",

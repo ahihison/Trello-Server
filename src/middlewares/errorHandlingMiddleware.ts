@@ -2,7 +2,7 @@
 /* eslint-disable no-unused-vars */
 import { StatusCodes } from 'http-status-codes';
 import  { ErrorRequestHandler, NextFunction, Request, Response } from 'express';
-// import { env } from '~/config/environment'
+
 interface ErrorHandler extends Error {
   statusCode?: number;
 }
@@ -23,6 +23,8 @@ export const errorHandlingMiddleware: ErrorRequestHandler = (
         message: err.message || StatusCodes[err.statusCode], // Nếu lỗi mà không có message thì lấy ReasonPhrases chuẩn theo mã Status Code
         stack: err.stack
     };
-   
+    // Nếu không phải môi trường dev thì không cần trả về stack
+    if (process.env.BUILD_MODE !== 'dev') delete responseError.stack;
+    
     res.status(responseError.statusCode).json(responseError);
 };
