@@ -1,20 +1,22 @@
 /* eslint-disable require-await */
-import express from 'express';
-import { mapOrder } from '../src/utils/sorts';
-import { CONNECT_DB, CLOSE_DB } from './config/mongodb';
 import exitHook from 'async-exit-hook';
-import  'dotenv/config';
+import 'dotenv/config';
+import express from 'express';
+import { CLOSE_DB, CONNECT_DB } from './config/mongodb';
 import { API_V1 } from "./routes/v1/index";
+import { errorHandlingMiddleware } from './middlewares/errorHandlingMiddleware';
 const app = express();
 
 const hostname = 'localhost';
 const port = 8017;
+
 
 const START_SERVER = () => {
     //enable request body json
     app.use(express.json());
     // eslint-disable-next-line @typescript-eslint/no-misused-promises, @typescript-eslint/require-await
     app.use('/v1', API_V1);
+    app.use(errorHandlingMiddleware);
     app.listen(port, hostname, () => {
     // eslint-disable-next-line no-console
         console.log(`Hello Sown Dev, I am running at ${ hostname }:${ port }/`);

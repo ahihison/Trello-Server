@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import  { NextFunction, Request, Response } from 'express';
 interface Error{
     message: string;
 
 }
 import { StatusCodes } from "http-status-codes";
+import ApiError  from '@/utils/apiError';
 const createNew = (req: Request, res: Response, next: NextFunction): void => {
 
     try {
@@ -11,10 +13,12 @@ const createNew = (req: Request, res: Response, next: NextFunction): void => {
         
         console.log('req.body', req.query);
         console.log('req.body', req.params);
-        res.status(StatusCodes.OK).json({ status: 'POST: API Create New Board from controller' });
+        throw new ApiError(StatusCodes.BAD_REQUEST, 'This is a custom error message');
+        // res.status(StatusCodes.OK).json({ status: 'POST: API Create New Board from controller' });
     } catch (error: unknown){
-
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ errors: 'Internal Server Error' });
+        //if use next(error) it will go to errorHandler
+        next(error);
+        // res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ errors: 'Internal Server Error' });
     }
 };
 export const boardController = { createNew };

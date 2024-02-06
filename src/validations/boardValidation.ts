@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import Joi from 'joi';
-
+import ApiError from '@/utils/apiError';
 const createNew = async(req: Request, res: Response, next: NextFunction): Promise <void> => {
     const correctCondition  = Joi.object({
         title: Joi.string().required().min(3).max(50).trim().strict(),
@@ -15,7 +15,9 @@ const createNew = async(req: Request, res: Response, next: NextFunction): Promis
         
         next();
     } catch (error){
-        res.status(StatusCodes.UNPROCESSABLE_ENTITY).json({ errors: new Error(error as string).message });
+        const errorMessages = new Error(error as string).message;
+        const customError = new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, errorMessages);
+        next(customError);
     }
 };
 
