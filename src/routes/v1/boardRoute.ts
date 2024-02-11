@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
+require('module-alias/register');
 import express from 'express';
 import { StatusCodes } from 'http-status-codes';
-import { boardValidation } from '../../validations/boardValidation';
-import { boardController } from '../../controllers/boardController';
+
+import { boardValidation } from '@/validations/boardValidation';
+import { boardController } from '@/controllers/boardController';
 const Router = express.Router();
 
 Router.route('/:id')

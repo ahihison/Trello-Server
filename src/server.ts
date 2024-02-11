@@ -2,9 +2,11 @@
 import exitHook from 'async-exit-hook';
 import 'dotenv/config';
 import express from 'express';
+
 import { CLOSE_DB, CONNECT_DB } from './config/mongodb';
 import { API_V1 } from "./routes/v1/index";
 import { errorHandlingMiddleware } from './middlewares/errorHandlingMiddleware';
+
 const app = express();
 
 const hostname = 'localhost';
