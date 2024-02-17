@@ -6,15 +6,15 @@ interface Error{
 }
 import { StatusCodes } from "http-status-codes";
 import  ApiError  from "../utils/ApiError";
+import { boardService } from '@/services/boardService';
 const createNew = (req: Request, res: Response, next: NextFunction): void => {
 
     try {
-        //
+        //navigate to boardService
+        const createdBoard = boardService.createNew(req.body);
         
-        console.log('req.body', req.query);
-        console.log('req.body', req.params);
-        throw new ApiError(StatusCodes.BAD_REQUEST, 'This is a custom error message');
-        // res.status(StatusCodes.OK).json({ status: 'POST: API Create New Board from controller' });
+        //return the created board to the client
+        res.status(StatusCodes.CREATED).json(createdBoard);
     } catch (error: unknown){
         //if use next(error) it will go to errorHandler
         next(error);
