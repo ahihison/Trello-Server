@@ -1,17 +1,18 @@
 import { slugify } from "@/utils/formetter";
-interface IreqBody {
-    title: string;
-    description: string;
-}
-const createNew =  (reqBody: IreqBody): IreqBody => {
+import { IBoard } from "@/types/boardType";
+import { boardModel } from "@/models/boardModel";
+import { WithId } from "mongodb";
+const createNew =  async (reqBody: IBoard): Promise<IBoard|null> => {
     try {
     
         const newBoard = {
             ...reqBody,
             slug:slugify(reqBody.title)
         };
+        const createdBoard = await boardModel.createNew(newBoard);
+        const getNewBoard = await boardModel.findOneById(createdBoard.insertedId);  
         
-        return newBoard;
+        return getNewBoard;
     } catch (error: unknown) {
         throw new Error(error as string);
   

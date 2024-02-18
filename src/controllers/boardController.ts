@@ -5,13 +5,14 @@ interface Error{
 
 }
 import { StatusCodes } from "http-status-codes";
-import  ApiError  from "../utils/ApiError";
+
 import { boardService } from '@/services/boardService';
-const createNew = (req: Request, res: Response, next: NextFunction): void => {
+import { IBoard } from '@/types/boardType';
+const createNew = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
 
     try {
         //navigate to boardService
-        const createdBoard = boardService.createNew(req.body);
+        const createdBoard = await boardService.createNew(req.body as IBoard);
         
         //return the created board to the client
         res.status(StatusCodes.CREATED).json(createdBoard);
