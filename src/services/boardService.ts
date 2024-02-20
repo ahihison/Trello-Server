@@ -1,7 +1,7 @@
 import { slugify } from "@/utils/formetter";
 import { IBoard } from "@/types/boardType";
 import { boardModel } from "@/models/boardModel";
-import { WithId } from "mongodb";
+
 const createNew =  async (reqBody: IBoard): Promise<IBoard|null> => {
     try {
     

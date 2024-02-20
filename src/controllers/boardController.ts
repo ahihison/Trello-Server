@@ -1,9 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import  { NextFunction, Request, Response } from 'express';
-interface Error{
-    message: string;
-
-}
 import { StatusCodes } from "http-status-codes";
 
 import { boardService } from '@/services/boardService';
