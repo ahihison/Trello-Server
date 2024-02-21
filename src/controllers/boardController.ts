@@ -4,6 +4,7 @@ import { StatusCodes } from "http-status-codes";
 
 import { boardService } from '@/services/boardService';
 import { IBoard } from '@/types/boardType';
+import { ObjectId } from 'mongodb';
 const createNew = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
 
     try {
@@ -18,4 +19,19 @@ const createNew = async (req: Request, res: Response, next: NextFunction): Promi
         // res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ errors: 'Internal Server Error' });
     }
 };
-export const boardController = { createNew };
+
+const getDetails = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+
+    try {
+        const boardId = req.params.id;
+        //navigate to boardService
+        const board = await boardService.getDetails(new ObjectId(boardId));
+        //return the created board to the client
+        res.status(StatusCodes.OK).json(board);
+    } catch (error: unknown){
+        //if use next(error) it will go to errorHandler
+        next(error);
+        // res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ errors: 'Internal Server Error' });
+    }
+};
+export const boardController = { createNew, getDetails };

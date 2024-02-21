@@ -38,8 +38,19 @@ const findOneById = async(id: ObjectId): Promise<IBoard> => {
     }
 
 };
+const getDetails = async(id: ObjectId): Promise<IBoard> => {
+    try {
+        const board = await GET_DB().collection(BOARD_CONLECTION_NAME).findOne({ _id: id });
+    
+        return board as IBoard;
+    } catch (err: unknown){
+        throw new Error(err as string);
+    }
+
+};
 export const boardModel = { 
     BOARD_CONLECTION_NAME, 
     BOARD_CONLECTION_SCHEMA,
     createNew,
-    findOneById };
+    findOneById,
+    getDetails };

@@ -1,6 +1,9 @@
 import { slugify } from "@/utils/formetter";
 import { IBoard } from "@/types/boardType";
 import { boardModel } from "@/models/boardModel";
+import ApiError from "@/utils/ApiError";
+import { StatusCodes } from "http-status-codes";
+import { ObjectId } from "mongodb";
 
 const createNew =  async (reqBody: IBoard): Promise<IBoard|null> => {
     try {
@@ -19,5 +22,21 @@ const createNew =  async (reqBody: IBoard): Promise<IBoard|null> => {
     }
 };
 
+const getDetails =  async (boardId: ObjectId): Promise<IBoard|null> => {
+    try {
+    
+     
+        const board = await boardModel.getDetails(boardId);
+        if (!board){
+            throw new ApiError(StatusCodes.NOT_FOUND, 'Board not found');
+        }
+        return board;
+    } catch (error: unknown) {
+        throw new Error(error as string);
+  
+    }
+};
 
-export const boardService = { createNew };
+
+
+export const boardService = { createNew, getDetails };
