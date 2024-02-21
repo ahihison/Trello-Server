@@ -22,15 +22,14 @@ const createNew =  async (reqBody: IBoard): Promise<IBoard|null> => {
     }
 };
 
-const getDetails =  async (boardId: ObjectId): Promise<IBoard|null> => {
+const getDetails =  async (boardId: string): Promise<IBoard|null> => {
     try {
     
-     
-        const board = await boardModel.getDetails(boardId);
+        const board = await boardModel.getDetails(new ObjectId(boardId));
         if (!board){
             throw new ApiError(StatusCodes.NOT_FOUND, 'Board not found');
         }
-        return board;
+        return board ;
     } catch (error: unknown) {
         throw new Error(error as string);
   

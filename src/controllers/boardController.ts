@@ -25,7 +25,7 @@ const getDetails = async (req: Request, res: Response, next: NextFunction): Prom
     try {
         const boardId = req.params.id;
         //navigate to boardService
-        const board = await boardService.getDetails(new ObjectId(boardId));
+        const board = await boardService.getDetails(boardId.toString());
         //return the created board to the client
         res.status(StatusCodes.OK).json(board);
     } catch (error: unknown){
