@@ -2,12 +2,11 @@
 import exitHook from 'async-exit-hook';
 import 'dotenv/config';
 import express from 'express';
-
+import cors from 'cors';
 import { CLOSE_DB, CONNECT_DB } from './config/mongodb';
 import { API_V1 } from "./routes/v1/index";
 import { errorHandlingMiddleware } from './middlewares/errorHandlingMiddleware';
-
-const app = express();
+import { corsOptions } from './config/cors';
 
 const hostname = 'localhost';
 const port = 8017;
@@ -15,6 +14,9 @@ const port = 8017;
 
 const START_SERVER = () => {
     //enable request body json
+    const app = express();
+    //enable cors
+    app.use(cors(corsOptions));
     app.use(express.json());
     // eslint-disable-next-line @typescript-eslint/no-misused-promises, @typescript-eslint/require-await
     app.use('/v1', API_V1);
