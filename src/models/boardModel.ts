@@ -67,7 +67,7 @@ const getDetails = async(id: ObjectId): Promise<IResBoard> => {
             } }
         ]).toArray();
     
-        return result[0] as IResBoard || {};
+        return result[0] as IResBoard || null;
     } catch (err: unknown){
         throw new Error(err as string);
     }

@@ -1,10 +1,10 @@
-import { slugify } from "@/utils/formetter";
-import { IBoard, ICard, IColumn, IResBoard } from "@/types/boardType";
 import { boardModel } from "@/models/boardModel";
+import { IBoard, ICard, IColumn } from "@/types/boardType";
 import ApiError from "@/utils/ApiError";
+import { slugify } from "@/utils/formetter";
 import { StatusCodes } from "http-status-codes";
-import { ObjectId } from "mongodb";
 import { cloneDeep } from "lodash";
+import { ObjectId } from "mongodb";
 
 
 const createNew =  async (reqBody: IBoard): Promise<IBoard|null> => {
@@ -28,7 +28,7 @@ const getDetails =  async (boardId: string): Promise<IBoard|null> => {
     try {
     
         const board = await boardModel.getDetails(new ObjectId(boardId));
-  
+        
         if (!board){
             throw new ApiError(StatusCodes.NOT_FOUND, 'Board not found');
         }
