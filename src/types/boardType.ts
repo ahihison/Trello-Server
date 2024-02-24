@@ -16,7 +16,7 @@ export interface IColumn {
   // ... other properties
 }
 export interface IBoard extends WithId<Document> {
-    id: string;
+
     title: string;
     type: string;
     slug: string;
