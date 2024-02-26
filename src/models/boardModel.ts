@@ -2,10 +2,11 @@ import Joi from "joi";
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '@/utils/validators';
 import { IBoard, IResBoard } from "@/types/boardType";
 import { GET_DB } from "@/config/mongodb";
-import { InsertOneResult, ObjectId } from "mongodb";
+import { InsertOneResult, ObjectId, UpdateFilter } from "mongodb";
 import { BOARD_TYPES } from "@/utils/constants";
 import { columnModel } from "./columnModel";
 import { cardModel } from "./cardModel";
+import { ColumnType } from "@/types/columnType";
 const BOARD_CONLECTION_NAME = "boards";
 const BOARD_CONLECTION_SCHEMA = Joi.object({
     title: Joi.string().required().min(3).max(50).trim().strict(),
@@ -73,9 +74,25 @@ const getDetails = async(id: ObjectId): Promise<IResBoard> => {
     }
 
 };
+const pushColumnOrderIds = async(column: ColumnType): Promise<IBoard> => {
+    try {
+        const result = await GET_DB().collection(BOARD_CONLECTION_NAME).findOneAndUpdate(
+            { _id: new ObjectId(column.boardId) },
+            { $push: { columnOrderIds: new ObjectId(column._id) } as UpdateFilter<Document> }, {
+                returnDocument: 'after'
+            }
+    
+        );
+        return result?.value as IBoard;
+    } catch (err: unknown){
+        throw new Error(err as string);
+    
+    }
+};
 export const boardModel = { 
     BOARD_CONLECTION_NAME, 
     BOARD_CONLECTION_SCHEMA,
     createNew,
     findOneById,
-    getDetails };
+    getDetails,
+    pushColumnOrderIds };
