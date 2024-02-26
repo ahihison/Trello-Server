@@ -23,7 +23,7 @@ const createNew = async(data: CardType): Promise<InsertOneResult<Document>> => {
     try {
         const validData = await validateBeforeCreate(data);
      
-        const createdCard = await GET_DB().collection(CARD_COLLECTION_NAME).insertOne(validData);
+        const createdCard = await GET_DB().collection(CARD_COLLECTION_NAME).insertOne({ ...validData, boardId: new ObjectId(validData.boardId), columnId: new ObjectId(validData.columnId) });
        
         return createdCard;
     } catch (err: unknown){
