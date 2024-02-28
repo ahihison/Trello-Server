@@ -24,5 +24,25 @@ const createNew = async(req: Request, res: Response, next: NextFunction): Promis
         next(customError);
     }
 };
-
-export const boardValidation = { createNew };
+const update = async(req: Request, res: Response, next: NextFunction): Promise <void> => {
+    //update dont use required
+    const correctCondition  = Joi.object({
+        title: Joi.string().min(3).max(50).trim().strict(),
+        description: Joi.string().min(3).max(256).trim().strict(),
+        type:Joi.string().valid(BOARD_TYPES.PUBLIC, BOARD_TYPES.PRIVATE)
+    });
+    try {
+        await correctCondition.validateAsync(req.body, 
+            { 
+                abortEarly: false,
+                allowUnknown: true //dont need to validate all fields
+            }
+        );
+        next();
+    } catch (error){
+        const errorMessages = new Error(error as string).message;
+        const customError = new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, errorMessages);
+        next(customError);
+    }
+};
+export const boardValidation = { createNew, update };

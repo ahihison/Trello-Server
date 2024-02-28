@@ -55,7 +55,7 @@ const pushCardOrderIds = async(card: CardType): Promise<ColumnType> => {
             }
     
         );
-        return result?.value as ColumnType;
+        return result as ColumnType;
     } catch (err: unknown){
         throw new Error(err as string);
     

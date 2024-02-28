@@ -34,4 +34,18 @@ const getDetails = async (req: Request, res: Response, next: NextFunction): Prom
         // res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ errors: 'Internal Server Error' });
     }
 };
-export const boardController = { createNew, getDetails };
+const update = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+
+    try {
+        const boardId = req.params.id;
+        //navigate to boardService
+        const updatedBoard = await boardService.update(boardId.toString(), req.body as Request);
+        //return the created board to the client
+        res.status(StatusCodes.OK).json(updatedBoard);
+    } catch (error: unknown){
+        //if use next(error) it will go to errorHandler
+        next(error);
+        // res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ errors: 'Internal Server Error' });
+    }
+};
+export const boardController = { createNew, getDetails, update };
