@@ -7,7 +7,9 @@ import { BOARD_TYPES } from "@/utils/constants";
 import { columnModel } from "./columnModel";
 import { cardModel } from "./cardModel";
 import { ColumnType } from "@/types/columnType";
+const INVALID_UPDATE_FIELDS = ['_id', 'createdAt'];
 const BOARD_CONLECTION_NAME = "boards";
+
 const BOARD_CONLECTION_SCHEMA = Joi.object({
     title: Joi.string().required().min(3).max(50).trim().strict(),
     slug: Joi.string().required().min(3).trim().strict(),
@@ -83,7 +85,28 @@ const pushColumnOrderIds = async(column: ColumnType): Promise<IBoard> => {
             }
     
         );
-        return result?.value as IBoard;
+        return result as IBoard;
+    } catch (err: unknown){
+        throw new Error(err as string);
+    
+    }
+};
+const update = async(boardId: string, updateData: IBoard): Promise<IBoard> => {
+    try {
+        Object.keys(updateData).forEach((key) => {
+            if (INVALID_UPDATE_FIELDS.includes(key)){
+                delete updateData[key as keyof typeof updateData];
+            }
+        });
+ 
+        const result = await GET_DB().collection(BOARD_CONLECTION_NAME).findOneAndUpdate(
+            { _id: new ObjectId(boardId) },
+            { $set: updateData }, {
+                returnDocument: 'after'
+            }
+    
+        );
+        return result as IBoard;
     } catch (err: unknown){
         throw new Error(err as string);
     
@@ -95,4 +118,5 @@ export const boardModel = {
     createNew,
     findOneById,
     getDetails,
-    pushColumnOrderIds };
+    pushColumnOrderIds,
+    update };

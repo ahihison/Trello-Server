@@ -2,6 +2,7 @@ import { boardModel } from "@/models/boardModel";
 import { IBoard, ICard, IColumn } from "@/types/boardType";
 import ApiError from "@/utils/ApiError";
 import { slugify } from "@/utils/formetter";
+import { Request } from "express";
 import { StatusCodes } from "http-status-codes";
 import { cloneDeep } from "lodash";
 import { ObjectId } from "mongodb";
@@ -55,7 +56,21 @@ const getDetails =  async (boardId: string): Promise<IBoard|null> => {
   
     }
 };
+const update =  async (boardId: string, reqBody: Request): Promise<IBoard|null> => {
+    try {
+        const updateData = {
+            ...reqBody,
+            updatedAt: Date.now()
+        };
+        const updatedBoard = await boardModel.update(boardId, updateData as unknown as IBoard);
+      
+        
+        return updatedBoard ;
+    } catch (error: unknown) {
+        throw new Error(error as string);
+  
+    }
+};
 
 
-
-export const boardService = { createNew, getDetails };
+export const boardService = { createNew, getDetails, update };
