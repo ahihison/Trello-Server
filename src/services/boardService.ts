@@ -1,5 +1,8 @@
+
 import { boardModel } from "@/models/boardModel";
-import { IBoard, ICard, IColumn } from "@/types/boardType";
+import { cardModel } from "@/models/cardModel";
+import { columnModel } from "@/models/columnModel";
+import { IBoard, ICard, IColumn, IMoveCardToDifferentColumn } from "@/types/boardType";
 import ApiError from "@/utils/ApiError";
 import { slugify } from "@/utils/formetter";
 import { Request } from "express";
@@ -72,5 +75,34 @@ const update =  async (boardId: string, reqBody: Request): Promise<IBoard|null> 
     }
 };
 
+const moveCardToDifferentColumn =  async (reqBody: IMoveCardToDifferentColumn): Promise<object|null> => {
+    try {
+       
+      
+        //check if the card is in the same column
+        if (reqBody?.prevColumnId === reqBody?.nextColumnId){
+            return { updateResult:"successfully" } ;
+        }
+        //update arr cardOrderIds in the first column has card
+        await columnModel.update(reqBody?.prevColumnId, {
+            cardOrderIds: reqBody.prevCardOrderIds,
+            updatedAt: Date.now()
+        });
+        //update arr cardOrderIds in the second column
+        await columnModel.update(reqBody?.nextColumnId, {
+            cardOrderIds: reqBody.nextCardOrderIds,
+            updatedAt: Date.now()
+        });
+        //update columnId of the card
+        await cardModel.update(reqBody?.activeCardId, {
+            columnId: new ObjectId(reqBody?.nextColumnId),
+            updatedAt: Date.now()
+        });
+        return { updateResult:"successfully" } ;
+    } catch (error: unknown) {
+        throw new Error(error as string);
+  
+    }
+};
 
-export const boardService = { createNew, getDetails, update };
+export const boardService = { createNew, getDetails, update, moveCardToDifferentColumn };

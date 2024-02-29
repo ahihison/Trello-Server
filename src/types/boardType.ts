@@ -1,4 +1,4 @@
-import { WithId } from "mongodb";
+import { ObjectId, WithId } from "mongodb";
 export interface ICard {
     _id: string;
     title: string;
@@ -21,7 +21,7 @@ export interface IBoard extends WithId<Document> {
     type: string;
     slug: string;
     description: string;
-    columnOrderIds: string[];
+    columnOrderIds: ObjectId[];
     createdAt: Date;
     updatedAt: Date;
     _destroy: boolean;
@@ -32,4 +32,12 @@ export interface IResBoard extends IBoard {
     columns: IColumn[];
     cards?: ICard[];
 
+}
+export interface IMoveCardToDifferentColumn {
+        activeCardId: string,
+        prevColumnId: string,
+        prevCardOrderIds: [],
+        cardOrderIds: [],
+        nextColumnId: string,
+        nextCardOrderIds: []
 }

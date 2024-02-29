@@ -98,7 +98,11 @@ const update = async(boardId: string, updateData: IBoard): Promise<IBoard> => {
                 delete updateData[key as keyof typeof updateData];
             }
         });
- 
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        if (updateData.columnOrderIds){
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument
+            updateData.columnOrderIds = updateData.columnOrderIds.map((_id: any) => new ObjectId(_id));
+        }
         const result = await GET_DB().collection(BOARD_CONLECTION_NAME).findOneAndUpdate(
             { _id: new ObjectId(boardId) },
             { $set: updateData }, {

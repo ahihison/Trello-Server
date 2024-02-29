@@ -1,9 +1,12 @@
 import { GET_DB } from "@/config/mongodb";
 import { CardType } from "@/types/cardType";
+import { ColumnType } from "@/types/columnType";
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '@/utils/validators';
 import Joi from 'joi';
 import { InsertOneResult, ObjectId } from "mongodb";
+const INVALID_UPDATE_FIELDS = ['_id', 'boardId', 'createdAt'];
 // Define Collection (name & schema)
+
 const CARD_COLLECTION_NAME = 'cards';
 const CARD_COLLECTION_SCHEMA = Joi.object({
     boardId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
@@ -40,9 +43,32 @@ const findOneById = async(id: ObjectId): Promise<CardType> => {
     }
 
 };
+const update = async(cardId: string, updateData: ColumnType|object): Promise<ColumnType> => {
+    try {
+        Object.keys(updateData).forEach((key) => {
+            if (INVALID_UPDATE_FIELDS.includes(key)){
+                delete updateData[key as keyof typeof updateData];
+            }
+        });
+      
+        const result = await GET_DB().collection(CARD_COLLECTION_NAME).findOneAndUpdate(
+            { _id: new ObjectId(cardId) },
+            { $set: updateData }, {
+                returnDocument: 'after'
+            }
+    
+        );
+     
+        return result as ColumnType;
+    } catch (err: unknown){
+        throw new Error(err as string);
+    
+    }
+};
 export const cardModel = {
     CARD_COLLECTION_NAME,
     CARD_COLLECTION_SCHEMA,
     createNew,
-    findOneById
+    findOneById,
+    update
 };
