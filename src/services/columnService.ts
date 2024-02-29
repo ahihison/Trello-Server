@@ -1,6 +1,7 @@
 import { columnModel } from "@/models/columnModel";
 import { ColumnType } from "@/types/columnType";
 import { boardModel } from "@/models/boardModel";
+import { ObjectId } from "mongodb";
 
 
 const createNew =  async (reqBody: ColumnType): Promise<ColumnType|null> => {
@@ -24,7 +25,24 @@ const createNew =  async (reqBody: ColumnType): Promise<ColumnType|null> => {
 };
 
 
+const update =  async (columnId: string, reqBody: ColumnType): Promise<ColumnType|null> => {
+    try {
+        
+        const updateData = {
+            ...reqBody,
+            updatedAt: Date.now()
+        };
+        
+      
+        const updatedColumn = await columnModel.update( columnId, updateData as unknown as ColumnType);
+      
+        
+        return updatedColumn ;
+    } catch (error: unknown) {
+        throw new Error(error as string);
+  
+    }
+};
 
 
-
-export const columnService = { createNew };
+export const columnService = { createNew, update };

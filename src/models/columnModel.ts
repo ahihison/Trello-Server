@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { GET_DB } from "@/config/mongodb";
 import { CardType } from "@/types/cardType";
 import { ColumnType } from "@/types/columnType";
@@ -7,6 +8,7 @@ import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '@/utils/validators';
 import Joi from 'joi';
 import { InsertOneResult, ObjectId, UpdateFilter } from "mongodb";
 // Define Collection (name & schema)
+const INVALID_UPDATE_FIELDS = ['_id', 'boardId', 'createdAt'];
 const COLUMN_COLLECTION_NAME = 'columns';
 const COLUMN_COLLECTION_SCHEMA = Joi.object({
     boardId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
@@ -61,10 +63,40 @@ const pushCardOrderIds = async(card: CardType): Promise<ColumnType> => {
     
     }
 };
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+const update = async(boardId: string, updateData: any): Promise<ColumnType> => {
+    try {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+        Object.keys(updateData).forEach((key) => {
+            if (INVALID_UPDATE_FIELDS.includes(key)){
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                delete updateData[key as keyof typeof updateData];
+            }
+        });
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        if (updateData.cardOrderIds){
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument
+            updateData.cardOrderIds = updateData.cardOrderIds.map((_id: any) => new ObjectId(_id));
+        }
+        const result = await GET_DB().collection(COLUMN_COLLECTION_NAME).findOneAndUpdate(
+            { _id: new ObjectId(boardId) },
+            { $set: updateData }, {
+                returnDocument: 'after'
+            }
+    
+        );
+     
+        return result as ColumnType;
+    } catch (err: unknown){
+        throw new Error(err as string);
+    
+    }
+};
 export const columnModel = {
     COLUMN_COLLECTION_NAME,
     COLUMN_COLLECTION_SCHEMA,
     createNew,
     findOneById,
-    pushCardOrderIds
+    pushCardOrderIds,
+    update
 };

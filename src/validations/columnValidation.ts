@@ -17,5 +17,25 @@ const createNew = async(req: Request, res: Response, next: NextFunction): Promis
         next(customError);
     }
 };
-
-export const columnValidation = { createNew };
+const update = async(req: Request, res: Response, next: NextFunction): Promise <void> => {
+    //update dont use required
+    const correctCondition  = Joi.object({
+        // boardId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
+        title:Joi.string().min(3).max(50).trim().strict(),
+        cardOrderIds: Joi.array().items(Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE))
+    });
+    try {
+        await correctCondition.validateAsync(req.body, 
+            { 
+                abortEarly: false,
+                allowUnknown: true //dont need to validate all fields
+            }
+        );
+        next();
+    } catch (error){
+        const errorMessages = new Error(error as string).message;
+        const customError = new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, errorMessages);
+        next(customError);
+    }
+};
+export const columnValidation = { createNew, update };
