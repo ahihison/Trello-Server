@@ -3,7 +3,7 @@ import { CardType } from "@/types/cardType";
 import { ColumnType } from "@/types/columnType";
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '@/utils/validators';
 import Joi from 'joi';
-import { InsertOneResult, ObjectId } from "mongodb";
+import { DeleteManyModel, DeleteResult, InsertOneResult, ObjectId } from "mongodb";
 const INVALID_UPDATE_FIELDS = ['_id', 'boardId', 'createdAt'];
 // Define Collection (name & schema)
 
@@ -65,10 +65,21 @@ const update = async(cardId: string, updateData: ColumnType|object): Promise<Col
     
     }
 };
+const deleteManyByColumnId = async(columnId: ObjectId): Promise<DeleteResult> => {
+    try {
+        const result = await GET_DB().collection(CARD_COLLECTION_NAME).deleteMany({ columnId: columnId });
+    
+        return result;
+    } catch (err: unknown){
+        throw new Error(err as string);
+    }
+
+};
 export const cardModel = {
     CARD_COLLECTION_NAME,
     CARD_COLLECTION_SCHEMA,
     createNew,
     findOneById,
-    update
+    update,
+    deleteManyByColumnId
 };

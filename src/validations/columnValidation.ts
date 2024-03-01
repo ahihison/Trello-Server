@@ -38,4 +38,21 @@ const update = async(req: Request, res: Response, next: NextFunction): Promise <
         next(customError);
     }
 };
-export const columnValidation = { createNew, update };
+const deleteItem = async(req: Request, res: Response, next: NextFunction): Promise <void> => {
+    //update dont use required
+    const correctCondition  = Joi.object({
+        id: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)
+      
+    });
+    try {
+        
+        await correctCondition.validateAsync(req.params);
+
+        next();
+    } catch (error){
+        const errorMessages = new Error(error as string).message;
+        const customError = new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, errorMessages);
+        next(customError);
+    }
+};
+export const columnValidation = { createNew, update, deleteItem };
