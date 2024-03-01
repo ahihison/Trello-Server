@@ -2,6 +2,7 @@ import { columnModel } from "@/models/columnModel";
 import { ColumnType } from "@/types/columnType";
 import { boardModel } from "@/models/boardModel";
 import { ObjectId } from "mongodb";
+import { cardModel } from "@/models/cardModel";
 
 
 const createNew =  async (reqBody: ColumnType): Promise<ColumnType|null> => {
@@ -43,6 +44,19 @@ const update =  async (columnId: string, reqBody: ColumnType): Promise<ColumnTyp
   
     }
 };
+const deleteItem =  async (columnId: string): Promise<object> => {
+    try {
+        
+        //delete Column
+        await columnModel.deleteOneById(new ObjectId (columnId));
+        //delete all Card of this column
+        await cardModel.deleteManyByColumnId(new ObjectId (columnId));
 
+        return { deleteResult:"Column and its Cards deleted successfully" } ;
+    } catch (error: unknown) {
+        throw new Error(error as string);
+  
+    }
+};
 
-export const columnService = { createNew, update };
+export const columnService = { createNew, update, deleteItem };

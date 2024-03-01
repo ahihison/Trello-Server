@@ -6,7 +6,7 @@ import { ColumnType } from "@/types/columnType";
 
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '@/utils/validators';
 import Joi from 'joi';
-import { InsertOneResult, ObjectId, UpdateFilter } from "mongodb";
+import { DeleteResult, InsertOneResult, ObjectId, UpdateFilter } from "mongodb";
 // Define Collection (name & schema)
 const INVALID_UPDATE_FIELDS = ['_id', 'boardId', 'createdAt'];
 const COLUMN_COLLECTION_NAME = 'columns';
@@ -92,11 +92,22 @@ const update = async(boardId: string, updateData: any): Promise<ColumnType> => {
     
     }
 };
+const deleteOneById = async(columnId: ObjectId): Promise<DeleteResult> => {
+    try {
+        const result = await GET_DB().collection(COLUMN_COLLECTION_NAME).deleteOne({ _id: columnId });
+      
+        return result ;
+    } catch (err: unknown){
+        throw new Error(err as string);
+    }
+
+};
 export const columnModel = {
     COLUMN_COLLECTION_NAME,
     COLUMN_COLLECTION_SCHEMA,
     createNew,
     findOneById,
     pushCardOrderIds,
-    update
+    update,
+    deleteOneById
 };

@@ -37,4 +37,20 @@ const update = async (req: Request, res: Response, next: NextFunction): Promise<
         // res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ errors: 'Internal Server Error' });
     }
 };
-export const columnController = { createNew, update };
+const deleteItem = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+
+    try {
+        const columnId = req.params.id;
+        
+        //navigate to boardService
+        
+        const result = await columnService.deleteItem(columnId.toString());
+        //return the created board to the client
+        res.status(StatusCodes.OK).json(result);
+    } catch (error: unknown){
+        //if use next(error) it will go to errorHandler
+        next(error);
+        // res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ errors: 'Internal Server Error' });
+    }
+};
+export const columnController = { createNew, update, deleteItem };
