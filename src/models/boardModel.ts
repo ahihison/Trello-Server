@@ -91,6 +91,21 @@ const pushColumnOrderIds = async(column: ColumnType): Promise<IBoard> => {
     
     }
 };
+const pullColumnOrderIds = async(column: ColumnType): Promise<IBoard> => {
+    try {
+        const result = await GET_DB().collection(BOARD_CONLECTION_NAME).findOneAndUpdate(
+            { _id: new ObjectId(column.boardId) },
+            { $pull: { columnOrderIds: new ObjectId(column._id) } as UpdateFilter<Document> }, {
+                returnDocument: 'after'
+            }
+    
+        );
+        return result as IBoard;
+    } catch (err: unknown){
+        throw new Error(err as string);
+    
+    }
+};
 const update = async(boardId: string, updateData: IBoard): Promise<IBoard> => {
     try {
         Object.keys(updateData).forEach((key) => {
@@ -123,4 +138,5 @@ export const boardModel = {
     findOneById,
     getDetails,
     pushColumnOrderIds,
-    update };
+    update,
+    pullColumnOrderIds };

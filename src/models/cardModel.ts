@@ -67,7 +67,7 @@ const update = async(cardId: string, updateData: ColumnType|object): Promise<Col
 };
 const deleteManyByColumnId = async(columnId: ObjectId): Promise<DeleteResult> => {
     try {
-        const result = await GET_DB().collection(CARD_COLLECTION_NAME).deleteMany({ columnId: columnId });
+        const result: DeleteResult = await GET_DB().collection(CARD_COLLECTION_NAME).deleteMany({ columnId: columnId });
     
         return result;
     } catch (err: unknown){

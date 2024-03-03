@@ -44,7 +44,7 @@ const deleteItem = async (req: Request, res: Response, next: NextFunction): Prom
         
         //navigate to boardService
         
-        const result = await columnService.deleteItem(columnId.toString());
+        const result: object = await columnService.deleteItem(columnId.toString());
         //return the created board to the client
         res.status(StatusCodes.OK).json(result);
     } catch (error: unknown){
