@@ -94,7 +94,7 @@ const update = async(boardId: string, updateData: any): Promise<ColumnType> => {
 };
 const deleteOneById = async(columnId: ObjectId): Promise<DeleteResult> => {
     try {
-        const result = await GET_DB().collection(COLUMN_COLLECTION_NAME).deleteOne({ _id: columnId });
+        const result: DeleteResult  = await GET_DB().collection(COLUMN_COLLECTION_NAME).deleteOne({ _id: columnId });
       
         return result ;
     } catch (err: unknown){

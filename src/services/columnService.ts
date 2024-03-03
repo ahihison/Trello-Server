@@ -3,6 +3,7 @@ import { ColumnType } from "@/types/columnType";
 import { boardModel } from "@/models/boardModel";
 import { ObjectId } from "mongodb";
 import { cardModel } from "@/models/cardModel";
+import ApiError from "@/utils/ApiError";
 
 
 const createNew =  async (reqBody: ColumnType): Promise<ColumnType|null> => {
@@ -46,12 +47,17 @@ const update =  async (columnId: string, reqBody: ColumnType): Promise<ColumnTyp
 };
 const deleteItem =  async (columnId: string): Promise<object> => {
     try {
-        
+        const targetColumn = await columnModel.findOneById(new ObjectId (columnId));
+        if (!targetColumn){
+            throw new ApiError(404, "Column not found");
+        }
         //delete Column
         await columnModel.deleteOneById(new ObjectId (columnId));
         //delete all Card of this column
         await cardModel.deleteManyByColumnId(new ObjectId (columnId));
 
+        //delete columnorderIds in board
+        await boardModel.pullColumnOrderIds(targetColumn);
         return { deleteResult:"Column and its Cards deleted successfully" } ;
     } catch (error: unknown) {
         throw new Error(error as string);
