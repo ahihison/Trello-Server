@@ -21,11 +21,20 @@ const START_SERVER = () => {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises, @typescript-eslint/require-await
     app.use('/v1', API_V1);
     app.use(errorHandlingMiddleware);
-    app.listen(port, hostname, () => {
-    // eslint-disable-next-line no-console
-        console.log(`Hello Sown Dev, I am running at ${ hostname }:${ port }/`);
+    if (process.env.BUILD_MODE === 'production'){
+        app.listen(process.env.PORT, () => {
+            // eslint-disable-next-line no-console
+            console.log(`Hello Sown Dev, I am running at prodcution ${ process.env.PORT}/`);
     
-    });
+        });
+    } else {
+        app.listen(port, hostname, () => {
+            // eslint-disable-next-line no-console
+            console.log(`Local Dev Hello Sown Dev, I am running at ${ hostname }:${ port }/`);
+    
+        });
+    }
+   
 };
 
 (async () => {
