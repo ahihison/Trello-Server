@@ -8,3 +8,8 @@ export const BOARD_TYPES = {
     PUBLIC: 'public',
     PRIVATE: 'private'
 };
+
+export const USER_ROLE = {
+    USER:'user',
+    ADMIN:'admin'
+};
