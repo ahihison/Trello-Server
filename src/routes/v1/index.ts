@@ -3,6 +3,7 @@ import { StatusCodes } from 'http-status-codes';
 import { boardRoute } from './boardRoute';
 import { cardRoute } from './cardRoute';
 import { columnRoute } from './columnRoute';
+import { authRoute } from './authRoute';
 const Router = express.Router();
 
 Router.get('/status', (req, res) => {
@@ -14,4 +15,6 @@ Router.use('/boards', boardRoute);
 Router.use('/cards', cardRoute);
 // Column APIs
 Router.use('/columns', columnRoute);
+//Auth
+Router.use('/auth', authRoute);
 export const API_V1 = Router;

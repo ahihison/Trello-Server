@@ -4,7 +4,6 @@ import { StatusCodes } from "http-status-codes";
 
 import { columnService } from '@/services/columnService';
 import { ColumnType } from '@/types/columnType';
-import { boardService } from '@/services/boardService';
 
 const createNew = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
 

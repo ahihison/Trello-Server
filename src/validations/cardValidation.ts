@@ -1,9 +1,8 @@
+import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '@/utils/validators';
 import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import Joi from 'joi';
 import ApiError from '../utils/ApiError';
-import { BOARD_TYPES } from '@/utils/constants';
-import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '@/utils/validators';
 const createNew = async(req: Request, res: Response, next: NextFunction): Promise <void> => {
     const correctCondition  = Joi.object({
         boardId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
