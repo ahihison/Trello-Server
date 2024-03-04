@@ -16,5 +16,5 @@ Router.use('/cards', cardRoute);
 // Column APIs
 Router.use('/columns', columnRoute);
 //Auth
-Router.use('/register', authRoute);
+Router.use('/auth', authRoute);
 export const API_V1 = Router;

@@ -1,12 +1,18 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { authModel } from "@/models/authModel";
 import { IAccountType } from "@/types/accountType";
+import { generateReFressToken, generateToken } from "@/utils/generateToken";
 import bcrypt from "bcrypt";
-import { Request } from "express";
-import { InsertOneResult } from "mongodb";
-const createNew = async (req: Request): Promise<InsertOneResult<Document>> => {
+import { Request, Response } from "express";
+const createNew = async (req: Request): Promise<IAccountType> => {
     try {
-        
+     
         const inforUser = req.body as IAccountType;
+        //check exist email 
+        const isExistEmail = await authModel.checkUserExist(inforUser.email);
+        if (isExistEmail){
+            throw new Error('Email is already exist');
+        }
         const saltRounds = 10;
         const salt = await bcrypt.genSalt(saltRounds) ;
         const hashedPassword = await bcrypt.hash(inforUser.password, salt);
@@ -15,15 +21,49 @@ const createNew = async (req: Request): Promise<InsertOneResult<Document>> => {
             email: inforUser.email,
             password: hashedPassword
         };
-
         //navigate to authModel
         const createNewAccount = await authModel.createNew(newAccount as IAccountType);
+        const getNewAccount = await authModel.findOneById(createNewAccount.insertedId);
         //return the created board to the client
-        return createNewAccount;
+        return getNewAccount;
+    } catch (error: unknown){
+        throw new Error(error as string);
+    }
+};
+const login = async (req: Request, res: Response): Promise<IAccountType> => {
+    try {
+     
+        const inforUser = req.body as IAccountType;
+        
+        const user = await authModel.checkUserExist(inforUser.email);
+        if (!user) throw new Error('Email is not exist');
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+     
+        const validPassword = await bcrypt.compare( inforUser.password, user.password );
+    
+        if (!validPassword) throw new Error('Password is not correct');
+        let dataRes = {};
+        if (user && validPassword){
+            const accessToken = generateToken(user);
+            const refreshToken = generateReFressToken(user);
+            const { password, ...userWithoutPassword } = user;
+            dataRes = { user: userWithoutPassword, accessToken };
+
+            //set access token to cookie
+            res.cookie("refreshToken", refreshToken, {
+                httpOnly: true,
+                secure: false,
+                path: "/",
+                sameSite: "strict"
+            });
+        }
+      
+        return dataRes as IAccountType;
+       
     } catch (error: unknown){
         throw new Error(error as string);
     }
 };
 export const authService = {
-    createNew
+    createNew, login
 };

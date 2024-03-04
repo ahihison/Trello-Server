@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-import  { NextFunction, Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from "http-status-codes";
 
 import { cardService } from '@/services/cardService';
 
-import { ObjectId } from 'mongodb';
 import { CardType } from '@/types/cardType';
 const createNew = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
 

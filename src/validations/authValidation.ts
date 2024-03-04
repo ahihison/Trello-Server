@@ -24,12 +24,28 @@ const createNew = async(req: Request, res: Response, next: NextFunction): Promis
         await correctCondition.validateAsync(req.body, { abortEarly: false });
         next();
     } catch (error){
+
         const errorMessages = new Error(error as string).message;
         const customError = new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, errorMessages);
         next(customError);
     }
 };
 
+const login = async(req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+        const correctCondition  = Joi.object({
+            email:Joi.string().required().email().trim().strict(),
+            password:Joi.string().required().min(6).max(50).trim().strict()
+        });
+        await correctCondition.validateAsync(req.body, { abortEarly: false });
+        next();
+    } catch (error: unknown){
+        const errorMessages = new Error(error as string).message;
+        const customError = new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, errorMessages);
+        next(customError);
+    }
+};
 export const authValidation = {
     createNew
+    , login
 };

@@ -6,14 +6,13 @@ import express from 'express';
 
 const Router = express.Router();
 
-Router.route('/')
-   
+Router.route('/register')
     .post(authValidation.createNew, authController.createNew);
 
 
 
-// Router.route('/login')
-//     .post(authValidation.login, authController.login);
+Router.route('/login')
+    .post(authValidation.login, authController.login);
 
 // Router.route('/refresh')
 //     .post(authValidation.refresh, authController.refresh);
