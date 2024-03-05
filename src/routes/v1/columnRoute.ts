@@ -4,12 +4,13 @@ import express from 'express';
 
 import { columnController } from '@/controllers/columnController';
 import { columnValidation } from '@/validations/columnValidation';
+import verifyTokenMiddleware from '@/middlewares/verifyTokenMiddleware';
 const Router = express.Router();
 
 Router.route('/')
-    .post(columnValidation.createNew, columnController.createNew);
+    .post(verifyTokenMiddleware.verifyToken, columnValidation.createNew, columnController.createNew);
 
 Router.route('/:id')
-    .put(columnValidation.update, columnController.update)
-    .delete(columnValidation.deleteItem, columnController.deleteItem);
+    .put(verifyTokenMiddleware.verifyToken, columnValidation.update, columnController.update)
+    .delete(verifyTokenMiddleware.verifyTokenAdmin, columnValidation.deleteItem, columnController.deleteItem);
 export const columnRoute = Router;

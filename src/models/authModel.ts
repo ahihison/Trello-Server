@@ -3,10 +3,10 @@ import { IAccountType } from "@/types/accountType";
 import { USER_ROLE } from "@/utils/constants";
 import { HASH_PASSWORD_RULE, HASH_PASSWORD_RULE_MESSAGE } from '@/utils/validators';
 import Joi from "joi";
-import { Document, InsertOneResult, ObjectId } from "mongodb";
+import { AggregationCursor, Document, InsertOneResult, ObjectId } from "mongodb";
 
 const ACCOUNT_CONLECTION_NAME = "accounts";
-
+const TOKEN_CONLECTION_NAME = "tokens";
 const ACCOUNT_CONLECTION_SCHEMA = Joi.object({
     userName: Joi.string().required().min(3).max(50).trim().strict(),
     email: Joi.string().required().email().trim().strict(),
@@ -46,9 +46,44 @@ const findOneById = async(id: ObjectId): Promise<IAccountType> => {
         throw new Error(err as string);
     }
 };
+const createNewRefreshToken = async(userId: ObjectId, refreshToken: string, expiryDate: Date): Promise<InsertOneResult> => {
+    try {
+        // const validData = await validateBeforeCreate(data);
+        const createdAccount = await GET_DB().collection(TOKEN_CONLECTION_NAME).insertOne({
+            userId,
+            refreshToken,
+            expiryDate
+        });
+        
+        return createdAccount;
+    } catch (err: unknown){
+        throw new Error(err as string);
+    
+    }
+};
+const checkUserExistByRefreshToken = async(refreshToken: string): Promise<AggregationCursor> => {
+    try {
+        const user = await GET_DB().collection(TOKEN_CONLECTION_NAME).aggregate([
+            { $match: { refreshToken } },
+            { $lookup: {
+                from: ACCOUNT_CONLECTION_NAME,
+                localField: 'userId',
+                foreignField: '_id',
+                as: 'accounts'
+            } }
+        ]).toArray();
+        console.log(user);
+        return user as unknown as AggregationCursor;
+    } catch (err: unknown){
+        throw new Error(err as string);
+    }
+    
+};
 
 export const authModel = {
     createNew,
     checkUserExist,
-    findOneById
+    findOneById,
+    createNewRefreshToken,
+    checkUserExistByRefreshToken
 };

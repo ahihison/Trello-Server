@@ -5,6 +5,7 @@ import { StatusCodes } from 'http-status-codes';
 
 import { boardValidation } from '@/validations/boardValidation';
 import { boardController } from '@/controllers/boardController';
+import verifyTokenMiddleware from '@/middlewares/verifyTokenMiddleware';
 const Router = express.Router();
 
 Router.route('/')
@@ -14,10 +15,10 @@ Router.route('/')
     .post(boardValidation.createNew, boardController.createNew);
 
 Router.route('/:id')
-    .get(boardController.getDetails)
-    .put(boardValidation.update, boardController.update);// update
+    .get(verifyTokenMiddleware.verifyToken, boardController.getDetails)
+    .put(verifyTokenMiddleware.verifyToken, boardValidation.update, boardController.update);// update
 
 // API support move different column
 Router.route('/supports/moving_card')
-    .put(boardValidation.moveCardToDifferentColumn, boardController.moveCardToDifferentColumn);
+    .put(verifyTokenMiddleware.verifyToken, boardValidation.moveCardToDifferentColumn, boardController.moveCardToDifferentColumn);
 export const boardRoute = Router;

@@ -47,8 +47,8 @@ const login = async (req: Request, res: Response): Promise<IAccountType> => {
             const accessToken = generateToken(user);
             const refreshToken = generateReFressToken(user);
             const { password, ...userWithoutPassword } = user;
-            dataRes = { user: userWithoutPassword, accessToken };
-
+            dataRes = { user:userWithoutPassword, accessToken };
+            authModel.createNewRefreshToken(user._id, refreshToken, new Date(Date.now() + 30 * 86400000));
             //set access token to cookie
             res.cookie("refreshToken", refreshToken, {
                 httpOnly: true,
@@ -64,6 +64,33 @@ const login = async (req: Request, res: Response): Promise<IAccountType> => {
         throw new Error(error as string);
     }
 };
+export const refreshToken  = async(req: Request, res: Response): Promise<void> => {
+    try {
+        
+       
+        console.log(req.cookies);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+        const refreshToken = req.cookies.refreshToken;
+        if (!refreshToken) throw new Error('No token');
+        const data = await authModel.checkUserExistByRefreshToken(refreshToken as string);
+        console.log('🚀 ~ refreshToken ~ data:', data);
+        // if (!user) throw new Error('No token');
+        // const accessToken = generateToken(user);
+        // const refreshTokenNew = generateReFressToken(user);
+        // const { password, ...userWithoutPassword } = user;
+        // const dataRes = { user: userWithoutPassword, accessToken };
+        // //set access token to cookie
+        // res.cookie("refreshToken", refreshTokenNew, {
+        //     httpOnly: true,
+        //     secure: false,
+        //     path: "/",
+        //     sameSite: "strict"
+        // });
+        // return dataRes as IAccountType;
+    } catch (error: unknown){
+        throw new Error(error as string);
+    }
+};
 export const authService = {
-    createNew, login
+    createNew, login, refreshToken
 };

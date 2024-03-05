@@ -44,7 +44,29 @@ const login = async (req: Request, res: Response, next: NextFunction): Promise<v
     }
 };
 
+const refreshToken = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+
+    try {
+        //navigate to boardService
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        await authService.refreshToken(req, res);
+        // if (dataRes){
+        //     //return the created board to the client
+        //     res.status(StatusCodes.OK).json(dataRes);
+        // }
+        res.status(StatusCodes.OK).json({ message:'Refresh token successfully' });
+       
+        
+    } catch (error: unknown){
+        //if use next(error) it will go to errorHandler
+        next(error);
+        // res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ errors: 'Internal Server Error' });
+    }
+};
 export const authController = {
     createNew
-    , login
+    , login,
+    refreshToken
 };

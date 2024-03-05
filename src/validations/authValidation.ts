@@ -45,7 +45,9 @@ const login = async(req: Request, res: Response, next: NextFunction): Promise<vo
         next(customError);
     }
 };
+
 export const authValidation = {
     createNew
     , login
+
 };
