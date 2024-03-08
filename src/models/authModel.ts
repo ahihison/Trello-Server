@@ -1,5 +1,5 @@
 import { GET_DB } from "@/config/mongodb";
-import { IAccountType } from "@/types/accountType";
+import { IAccountType, IGoogleAccount } from "@/types/accountType";
 import { USER_ROLE } from "@/utils/constants";
 import { HASH_PASSWORD_RULE, HASH_PASSWORD_RULE_MESSAGE } from '@/utils/validators';
 import Joi from "joi";
@@ -23,6 +23,25 @@ const validateBeforeCreate = async(data: IAccountType): Promise<IAccountType> =>
 const createNew = async(data: IAccountType): Promise<InsertOneResult<Document>> => {
     try {
         const validData = await validateBeforeCreate(data);
+        const createdAccount = await GET_DB().collection(ACCOUNT_CONLECTION_NAME).insertOne(validData);
+        
+        return createdAccount;
+    } catch (err: unknown){
+        throw new Error(err as string);
+    }
+};
+const createNewWithGoogle = async(data: IGoogleAccount): Promise<InsertOneResult<Document>> => {
+    try {
+        const validData = {
+            userName: data.name,
+            email: data.email,
+            password: '',
+            role: USER_ROLE.USER,
+            avatar: data.picture,
+            createdAt: Date.now(),
+            updatedAt: null,
+            _destroy: false
+        };
         const createdAccount = await GET_DB().collection(ACCOUNT_CONLECTION_NAME).insertOne(validData);
         
         return createdAccount;
@@ -61,7 +80,7 @@ const createNewRefreshToken = async(userId: ObjectId, refreshToken: string, expi
     
     }
 };
-const checkUserExistByRefreshToken = async(refreshToken: string): Promise<AggregationCursor> => {
+const checkUserExistByRefreshToken = async(refreshToken: string): Promise<Document[]> => {
     try {
         const user = await GET_DB().collection(TOKEN_CONLECTION_NAME).aggregate([
             { $match: { refreshToken } },
@@ -72,18 +91,39 @@ const checkUserExistByRefreshToken = async(refreshToken: string): Promise<Aggreg
                 as: 'accounts'
             } }
         ]).toArray();
-        console.log(user);
-        return user as unknown as AggregationCursor;
+        
+        return user;
+    } catch (err: unknown){
+        throw new Error(err as string);
+    }
+    
+};
+const updateRefreshToken = async(newRefreshToken: string, userId: ObjectId): Promise<Document> => {
+    console.log('🚀 ~ updateRefreshToken ~ newRefreshToken:', newRefreshToken, userId);
+    try {
+        
+        const user = await GET_DB().collection(TOKEN_CONLECTION_NAME).findOneAndUpdate(
+            { userId:new ObjectId(userId) },
+            { $set:{ refreshToken: newRefreshToken } }, {
+                returnDocument: 'after'
+            }
+        
+        );
+        
+        return user as Document;
     } catch (err: unknown){
         throw new Error(err as string);
     }
     
 };
 
+
 export const authModel = {
     createNew,
     checkUserExist,
     findOneById,
     createNewRefreshToken,
-    checkUserExistByRefreshToken
+    checkUserExistByRefreshToken,
+    updateRefreshToken,
+    createNewWithGoogle
 };

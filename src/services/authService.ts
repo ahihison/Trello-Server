@@ -1,9 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import { authModel } from "@/models/authModel";
-import { IAccountType } from "@/types/accountType";
+import { IAccountType, IGoogleAccount } from "@/types/accountType";
 import { generateReFressToken, generateToken } from "@/utils/generateToken";
 import bcrypt from "bcrypt";
 import { Request, Response } from "express";
+import { StatusCodes } from "http-status-codes";
+import jwt, { JwtPayload } from "jsonwebtoken";
 const createNew = async (req: Request): Promise<IAccountType> => {
     try {
      
@@ -67,30 +69,67 @@ const login = async (req: Request, res: Response): Promise<IAccountType> => {
 export const refreshToken  = async(req: Request, res: Response): Promise<void> => {
     try {
         
-       
-        console.log(req.cookies);
+        
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
         const refreshToken = req.cookies.refreshToken;
-        if (!refreshToken) throw new Error('No token');
+        if (!refreshToken) throw new Error('You are not authenticated!');
         const data = await authModel.checkUserExistByRefreshToken(refreshToken as string);
-        console.log('🚀 ~ refreshToken ~ data:', data);
-        // if (!user) throw new Error('No token');
-        // const accessToken = generateToken(user);
-        // const refreshTokenNew = generateReFressToken(user);
-        // const { password, ...userWithoutPassword } = user;
-        // const dataRes = { user: userWithoutPassword, accessToken };
-        // //set access token to cookie
-        // res.cookie("refreshToken", refreshTokenNew, {
-        //     httpOnly: true,
-        //     secure: false,
-        //     path: "/",
-        //     sameSite: "strict"
-        // });
-        // return dataRes as IAccountType;
+        
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+        // const user = authModel.findOneById(data[0].userId);
+        if (data.length == 0) throw new Error('Refresh Token is not valid!');
+        jwt.verify(
+            refreshToken as string,
+            process.env.JWT_REFRESS_TOKEN as string,
+            // eslint-disable-next-line @typescript-eslint/no-misused-promises
+            async(err, user) => {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+               
+                if (err){
+                    throw new Error('Refresh Token is not valid!');
+                }
+                
+                const newAccessToken = generateToken(user as IAccountType);
+                const newRefreshToken = generateReFressToken(user as IAccountType);
+            
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+                const resData = await authModel.updateRefreshToken(newRefreshToken, (user as any).id);
+                res.cookie("refreshToken", newRefreshToken, {
+                    httpOnly: true,
+                    secure: false,
+                    path: "/",
+                    sameSite: "strict"
+                });
+                res.status(200).json({ accessToken:newAccessToken });
+                
+            }
+        );
+    
+        
+    } catch (error: unknown){
+        throw new Error(error as string);
+    }
+};
+export const loginWithGoogle = async(req: IGoogleAccount, res: Response): Promise<void> => {
+    try {   
+        const checkUserExist =  await authModel.checkUserExist(req.email);
+        if (!checkUserExist){
+            const data = {
+                name: req.name,
+                email: req.email,
+                picture: req.picture
+            };
+            const dataRes = await authModel.createNewWithGoogle(data);
+            res.status(StatusCodes.OK).json(dataRes);
+        
+        } else {
+            res.status(StatusCodes.OK).json({ message: 'User is already exist' });
+        }
     } catch (error: unknown){
         throw new Error(error as string);
     }
 };
 export const authService = {
-    createNew, login, refreshToken
+    createNew, login, refreshToken,
+    loginWithGoogle
 };

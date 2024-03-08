@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import { authService } from '@/services/authService';
-import { IAccountType } from '@/types/accountType';
+import { IAccountType, IGoogleAccount } from '@/types/accountType';
 import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from "http-status-codes";
-
+import { OAuth2Client } from 'google-auth-library';
 
 const createNew = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
 
@@ -65,8 +65,27 @@ const refreshToken = async (req: Request, res: Response, next: NextFunction): Pr
         // res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ errors: 'Internal Server Error' });
     }
 };
+const loginWithGoogle = async(req: Request, res: Response, next: NextFunction): Promise<void> => {
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    const data = req.body as IGoogleAccount;
+    try {
+        const dataReq = {
+            name: data.name,
+            email: data.email,
+            picture: data.picture
+        };
+        const dataRes = await authService.loginWithGoogle(dataReq, res);
+    } catch (error: unknown){
+        next(error);
+    }
+  
+
+    
+};
 export const authController = {
     createNew
     , login,
-    refreshToken
+    refreshToken,
+    loginWithGoogle
 };
