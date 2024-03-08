@@ -1,12 +1,12 @@
 import { GET_DB } from "@/config/mongodb";
-import { IAccountType } from "@/types/accountType";
+import { IAccountType, IGoogleAccount } from "@/types/accountType";
 import { USER_ROLE } from "@/utils/constants";
 import { HASH_PASSWORD_RULE, HASH_PASSWORD_RULE_MESSAGE } from '@/utils/validators';
 import Joi from "joi";
-import { Document, InsertOneResult, ObjectId } from "mongodb";
+import { AggregationCursor, Document, InsertOneResult, ObjectId } from "mongodb";
 
 const ACCOUNT_CONLECTION_NAME = "accounts";
-
+const TOKEN_CONLECTION_NAME = "tokens";
 const ACCOUNT_CONLECTION_SCHEMA = Joi.object({
     userName: Joi.string().required().min(3).max(50).trim().strict(),
     email: Joi.string().required().email().trim().strict(),
@@ -30,6 +30,25 @@ const createNew = async(data: IAccountType): Promise<InsertOneResult<Document>> 
         throw new Error(err as string);
     }
 };
+const createNewWithGoogle = async(data: IGoogleAccount): Promise<InsertOneResult<Document>> => {
+    try {
+        const validData = {
+            userName: data.name,
+            email: data.email,
+            password: '',
+            role: USER_ROLE.USER,
+            avatar: data.picture,
+            createdAt: Date.now(),
+            updatedAt: null,
+            _destroy: false
+        };
+        const createdAccount = await GET_DB().collection(ACCOUNT_CONLECTION_NAME).insertOne(validData);
+        
+        return createdAccount;
+    } catch (err: unknown){
+        throw new Error(err as string);
+    }
+};
 const checkUserExist = async(email: string): Promise<IAccountType> => {
     try {
         const user = await GET_DB().collection(ACCOUNT_CONLECTION_NAME).findOne({ email });
@@ -46,9 +65,65 @@ const findOneById = async(id: ObjectId): Promise<IAccountType> => {
         throw new Error(err as string);
     }
 };
+const createNewRefreshToken = async(userId: ObjectId, refreshToken: string, expiryDate: Date): Promise<InsertOneResult> => {
+    try {
+        // const validData = await validateBeforeCreate(data);
+        const createdAccount = await GET_DB().collection(TOKEN_CONLECTION_NAME).insertOne({
+            userId,
+            refreshToken,
+            expiryDate
+        });
+        
+        return createdAccount;
+    } catch (err: unknown){
+        throw new Error(err as string);
+    
+    }
+};
+const checkUserExistByRefreshToken = async(refreshToken: string): Promise<Document[]> => {
+    try {
+        const user = await GET_DB().collection(TOKEN_CONLECTION_NAME).aggregate([
+            { $match: { refreshToken } },
+            { $lookup: {
+                from: ACCOUNT_CONLECTION_NAME,
+                localField: 'userId',
+                foreignField: '_id',
+                as: 'accounts'
+            } }
+        ]).toArray();
+        
+        return user;
+    } catch (err: unknown){
+        throw new Error(err as string);
+    }
+    
+};
+const updateRefreshToken = async(newRefreshToken: string, userId: ObjectId): Promise<Document> => {
+    console.log('🚀 ~ updateRefreshToken ~ newRefreshToken:', newRefreshToken, userId);
+    try {
+        
+        const user = await GET_DB().collection(TOKEN_CONLECTION_NAME).findOneAndUpdate(
+            { userId:new ObjectId(userId) },
+            { $set:{ refreshToken: newRefreshToken } }, {
+                returnDocument: 'after'
+            }
+        
+        );
+        
+        return user as Document;
+    } catch (err: unknown){
+        throw new Error(err as string);
+    }
+    
+};
+
 
 export const authModel = {
     createNew,
     checkUserExist,
-    findOneById
+    findOneById,
+    createNewRefreshToken,
+    checkUserExistByRefreshToken,
+    updateRefreshToken,
+    createNewWithGoogle
 };

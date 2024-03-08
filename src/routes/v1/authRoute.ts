@@ -14,8 +14,8 @@ Router.route('/register')
 Router.route('/login')
     .post(authValidation.login, authController.login);
 
-// Router.route('/refresh')
-//     .post(authValidation.refresh, authController.refresh);
+Router.route('/refresh')
+    .post(authController.refreshToken);
 
 // Router.route('/logout')
 //     .post(authValidation.logout, authController.logout);

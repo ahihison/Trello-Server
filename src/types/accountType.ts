@@ -11,3 +11,9 @@ export interface IAccountType{
     updatedAt: Date;
     _destroy: boolean;
 }
+export interface IGoogleAccount {
+    name: string;
+    email: string;
+    picture: string;
+
+}

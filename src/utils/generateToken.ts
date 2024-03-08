@@ -5,7 +5,7 @@ export const generateToken = (user: IAccountType): string => {
         id:user._id, 
         admin:user.role === 'admin' }, 
       process.env.JWT_SECRET as string,
-      { expiresIn: "30s" }
+      { expiresIn: "2m" }
     );
     return token;
 };
@@ -15,7 +15,7 @@ export const generateReFressToken = (user: IAccountType): string => {
         id:user._id, 
         admin:user.role === 'admin' }, 
       process.env.JWT_REFRESS_TOKEN as string,
-      { expiresIn: "365d" }
+      { expiresIn: "30d" }
     );
     return token;
 };
