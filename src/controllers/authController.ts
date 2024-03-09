@@ -4,7 +4,10 @@ import { IAccountType, IGoogleAccount } from '@/types/accountType';
 import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from "http-status-codes";
 import { OAuth2Client } from 'google-auth-library';
-
+interface IRefreshTokenRes {
+    accessToken: string;
+    refreshToken: string;
+}
 const createNew = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
 
     try {
@@ -47,16 +50,17 @@ const login = async (req: Request, res: Response, next: NextFunction): Promise<v
 const refreshToken = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
 
     try {
-        //navigate to boardService
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        await authService.refreshToken(req, res);
-        // if (dataRes){
-        //     //return the created board to the client
-        //     res.status(StatusCodes.OK).json(dataRes);
-        // }
-        res.status(StatusCodes.OK).json({ message:'Refresh token successfully' });
+       
+        const result =  await authService.refreshToken(req, res);
+        if (result){
+            res.cookie("refreshToken", (result as IRefreshTokenRes).refreshToken, {
+                httpOnly: true,
+                secure: false,
+                path: "/",
+                sameSite: "strict"
+            });
+            res.status(StatusCodes.OK).json({ accessToken:(result as IRefreshTokenRes).accessToken });
+        }
        
         
     } catch (error: unknown){
