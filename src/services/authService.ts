@@ -66,7 +66,9 @@ const login = async (req: Request, res: Response): Promise<IAccountType> => {
         throw new Error(error as string);
     }
 };
-export const refreshToken  = async(req: Request, res: Response): Promise<void> => {
+export const refreshToken  = async(req: Request, res: Response): Promise<object> => {
+    let newAccessToken = '';
+    let newRefreshToken = '';
     try {
         
         
@@ -87,24 +89,19 @@ export const refreshToken  = async(req: Request, res: Response): Promise<void> =
                
                 if (err){
                     throw new Error('Refresh Token is not valid!');
-                }
-                
-                const newAccessToken = generateToken(user as IAccountType);
-                const newRefreshToken = generateReFressToken(user as IAccountType);
+                } else if (user && typeof user !== 'string'){
+                    newAccessToken = generateToken(user as IAccountType);
+                    newRefreshToken = generateReFressToken(user as IAccountType);
             
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
-                const resData = await authModel.updateRefreshToken(newRefreshToken, (user as any).id);
-                res.cookie("refreshToken", newRefreshToken, {
-                    httpOnly: true,
-                    secure: false,
-                    path: "/",
-                    sameSite: "strict"
-                });
-                res.status(200).json({ accessToken:newAccessToken });
-                
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+                    const resData = await authModel.updateRefreshToken(newRefreshToken, (user as any).id);
+                    console.log('🚀 ~ async ~ resData:', resData);
+                    
+                }
             }
         );
-    
+        return { accessToken: newAccessToken,
+            refreshToken: newRefreshToken };
         
     } catch (error: unknown){
         throw new Error(error as string);
