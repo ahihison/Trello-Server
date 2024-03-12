@@ -4,8 +4,7 @@ import { IAccountType, IGoogleAccount } from "@/types/accountType";
 import { generateReFressToken, generateToken } from "@/utils/generateToken";
 import bcrypt from "bcrypt";
 import { Request, Response } from "express";
-import { StatusCodes } from "http-status-codes";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 const createNew = async (req: Request): Promise<IAccountType> => {
     try {
      
@@ -107,21 +106,37 @@ export const refreshToken  = async(req: Request, res: Response): Promise<object>
         throw new Error(error as string);
     }
 };
-export const loginWithGoogle = async(req: IGoogleAccount, res: Response): Promise<void> => {
+export const loginWithGoogle = async(req: IGoogleAccount, res: Response): Promise<IAccountType> => {
+
     try {   
         const checkUserExist =  await authModel.checkUserExist(req.email);
+        let dataRes = {};
         if (!checkUserExist){
             const data = {
                 name: req.name,
                 email: req.email,
                 picture: req.picture
             };
-            const dataRes = await authModel.createNewWithGoogle(data);
-            res.status(StatusCodes.OK).json(dataRes);
-        
+            dataRes = await authModel.createNewWithGoogle(data);
         } else {
-            res.status(StatusCodes.OK).json({ message: 'User is already exist' });
+            const user = await authModel.checkUserExist(req.email);
+            const accessToken = generateToken(user);
+            const refreshToken = generateReFressToken(user);
+            authModel.createNewRefreshToken(user._id, refreshToken, new Date(Date.now() + 30 * 86400000));
+            const { password, ...userWithoutPassword } = user;
+            dataRes = { user:userWithoutPassword, accessToken };
+               
+            //set access token to cookie
+            res.cookie("refreshToken", refreshToken, {
+                httpOnly: true,
+                secure: false,
+                path: "/",
+                sameSite: "strict"
+            });
         }
+        return dataRes as IAccountType ;
+        // res.status(StatusCodes.OK).json({ message: 'User is already exist' });
+        
     } catch (error: unknown){
         throw new Error(error as string);
     }

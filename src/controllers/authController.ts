@@ -80,6 +80,7 @@ const loginWithGoogle = async(req: Request, res: Response, next: NextFunction): 
             picture: data.picture
         };
         const dataRes = await authService.loginWithGoogle(dataReq, res);
+        res.status(StatusCodes.OK).json(dataRes);
     } catch (error: unknown){
         next(error);
     }
