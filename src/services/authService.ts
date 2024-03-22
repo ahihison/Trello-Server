@@ -73,12 +73,13 @@ export const refreshToken  = async(req: Request, res: Response): Promise<object>
         
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
         const refreshToken = req.cookies.refreshToken;
+        
         if (!refreshToken) throw new Error('You are not authenticated!');
         const data = await authModel.checkUserExistByRefreshToken(refreshToken as string);
         
         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         // const user = authModel.findOneById(data[0].userId);
-        if (data.length == 0) throw new Error('Refresh Token is not valid!');
+        if (data) throw new Error('Refresh Token is not valid!');
         jwt.verify(
             refreshToken as string,
             process.env.JWT_REFRESS_TOKEN as string,

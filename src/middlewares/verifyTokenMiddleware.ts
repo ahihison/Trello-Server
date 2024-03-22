@@ -13,7 +13,7 @@ declare global {
 const verifyTokenMiddleware = {
     verifyToken : (req: Request, res: Response, next: NextFunction): void => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        
+   
         const token = req.header('token');
         if (token){
             const accessToken = token.split(" ")[1];

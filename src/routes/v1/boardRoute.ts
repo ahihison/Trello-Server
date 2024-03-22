@@ -10,11 +10,14 @@ const Router = express.Router();
 
 Router.route('/')
     .get((req, res) => {
+       
+        
         res.status(StatusCodes.OK).json({ status: 'GET: API List Board' });
     })
     .post(boardValidation.createNew, boardController.createNew);
 
 Router.route('/:id')
+
     .get(verifyTokenMiddleware.verifyToken, boardController.getDetails)
     .put(verifyTokenMiddleware.verifyToken, boardValidation.update, boardController.update);// update
 

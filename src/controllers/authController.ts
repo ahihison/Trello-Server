@@ -50,7 +50,7 @@ const login = async (req: Request, res: Response, next: NextFunction): Promise<v
 const refreshToken = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
 
     try {
-       
+      
         const result =  await authService.refreshToken(req, res);
         if (result){
             res.cookie("refreshToken", (result as IRefreshTokenRes).refreshToken, {

@@ -19,6 +19,7 @@ const START_SERVER = () => {
     //enable cors
     
     app.use(cors(corsOptions));
+  
     app.use(cookieParser());
     app.use(express.json());
     // eslint-disable-next-line @typescript-eslint/no-misused-promises, @typescript-eslint/require-await

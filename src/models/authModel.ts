@@ -80,19 +80,12 @@ const createNewRefreshToken = async(userId: ObjectId, refreshToken: string, expi
     
     }
 };
-const checkUserExistByRefreshToken = async(refreshToken: string): Promise<Document[]> => {
+const checkUserExistByRefreshToken = async(refreshToken: string): Promise<boolean> => {
     try {
-        const user = await GET_DB().collection(TOKEN_CONLECTION_NAME).aggregate([
-            { $match: { refreshToken } },
-            { $lookup: {
-                from: ACCOUNT_CONLECTION_NAME,
-                localField: 'userId',
-                foreignField: '_id',
-                as: 'accounts'
-            } }
-        ]).toArray();
-        
-        return user;
+        const tokenDocument = await GET_DB().collection(TOKEN_CONLECTION_NAME).findOne({ refreshToken });
+
+        // If tokenDocument is not null, the refresh token exists
+        return tokenDocument !== null;
     } catch (err: unknown){
         throw new Error(err as string);
     }
